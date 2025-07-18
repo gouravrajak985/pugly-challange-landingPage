@@ -82,6 +82,51 @@
 }
 
 /* Custom animations for Pugly Dropshipping Challenge */
+
+/* Mobile-first responsive utilities */
+@media (max-width: 640px) {
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+  }
+  
+  .glass-button {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.06));
+    backdrop-filter: blur(8px);
+  }
+  
+  .glass-button:active {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(34, 197, 94, 0.1));
+  }
+}
+
+/* Touch-friendly interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improved mobile animations */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-blur-in {
+    animation: blur-in 0.8s ease-out;
+  }
+  
+  .animate-variable-proximity {
+    animation: variable-proximity 0.6s ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blur-in,
+  .animate-variable-proximity,
+  .animate-glow,
+  .animate-pulse,
+  .animate-bounce-subtle {
+    animation: none;
+  }
+}
+
 @keyframes gradient-x {
   0%, 100% {
     background-size: 200% 200%;
@@ -180,6 +225,50 @@
   }
 }
 
+/* Blur text animation */
+@keyframes blur-in {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: scale(1.1);
+  }
+  50% {
+    opacity: 0.7;
+    filter: blur(4px);
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+}
+
+@keyframes variable-proximity {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+    letter-spacing: 0.3em;
+  }
+  50% {
+    opacity: 0.7;
+    letter-spacing: 0.1em;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    letter-spacing: normal;
+  }
+}
+
+.animate-blur-in {
+  animation: blur-in 0.8s ease-out;
+}
+
+.animate-variable-proximity {
+  animation: variable-proximity 0.6s ease-out;
+}
+
 /* Animation classes */
 .animate-gradient-x {
   animation: gradient-x 3s ease infinite;
@@ -216,14 +305,14 @@
 /* Glass effect utilities */
 .glass-effect {
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
 .glass-button {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(34, 197, 94, 0.2);
   box-shadow: 
     0 8px 32px 0 rgba(34, 197, 94, 0.2),
@@ -236,6 +325,11 @@
   box-shadow: 
     0 12px 40px 0 rgba(34, 197, 94, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-button:active {
+  transform: scale(0.98);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
 }
 
 /* Aurora blob animation */
@@ -330,4 +424,28 @@
     linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px);
   background-size: 50px 50px;
   animation: float 20s ease-in-out infinite;
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 640px) {
+  .bg-grid-pattern {
+    background-size: 30px 30px;
+  }
+  
+  /* Reduce motion for better mobile performance */
+  .animate-float {
+    animation-duration: 8s;
+  }
+  
+  .animate-glow {
+    animation-duration: 3s;
+  }
+}
+
+/* Ensure proper viewport handling */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific styles */
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
 }
