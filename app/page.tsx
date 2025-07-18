@@ -5,12 +5,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Github, Twitter, Instagram, Trophy, Calendar } from "lucide-react";
+import { Globe, Instagram, Trophy, Calendar, Heart } from "lucide-react";
 import BlurText from "@/components/ui/blur-text";
 import VariableProximity from "@/components/ui/variable-proximity";
-import StarBorder from "@/components/ui/star-border";
 import TargetCursor from "@/components/ui/target-cursor";
-import AuroraBackground from "@/components/ui/aurora-background";
+import ParticleBackground from "@/components/ui/particle-background";
 import ShinyText from "@/components/ui/shiny-text";
 
 export default function Home() {
@@ -20,18 +19,46 @@ export default function Home() {
     email: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [referralCode, setReferralCode] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate form submission
-    console.log('Form submitted:', formData);
-    setIsSubmitted(true);
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setIsOpen(false);
-      setFormData({ name: '', email: '' });
-    }, 3000);
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setReferralCode(data.referralCode);
+        setIsSubmitted(true);
+        // Reset form after 5 seconds
+        setTimeout(() => {
+          setIsSubmitted(false);
+          setIsOpen(false);
+          setFormData({ name: '', email: '' });
+          setReferralCode('');
+          setError('');
+        }, 5000);
+      } else {
+        setError(data.message || 'Something went wrong');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +69,7 @@ export default function Home() {
   };
 
   return (
-    <AuroraBackground className="min-h-screen bg-black text-white">
+    <ParticleBackground className="min-h-screen bg-black text-white">
       {/* Target Cursor */}
       <TargetCursor />
 
@@ -60,10 +87,10 @@ export default function Home() {
             {/* Main Heading with Animation */}
             <div className="text-center mb-6">
               <div className="text-4xl sm:text-6xl lg:text-7xl font-bold">
-                <ShinyText 
+                <BlurText 
                   text="Pugly Dropshipping Challenge"
                   className="text-4xl sm:text-6xl lg:text-7xl font-bold"
-                  speed="2s"
+                  delay={200}
                 />
               </div>
             </div>
@@ -71,7 +98,7 @@ export default function Home() {
             {/* Animated Subtitle */}
             <div className="text-xl sm:text-2xl lg:text-3xl text-gray-300 mb-4 min-h-12 flex items-center justify-center">
               <VariableProximity
-                text="Launch. Sell. Win. $10,000 Prize Pool."
+                text="Launch. Sell. Win."
                 className="text-center"
                 animationDuration={0.6}
               />
@@ -84,28 +111,28 @@ export default function Home() {
             </div>
 
             {/* CTA Button */}
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-              <DialogTrigger asChild>
-                <Button className="glass-button text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 border-0">
-                  <StarBorder speed="3s" className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5 mr-2" />
+            <div className="flex justify-center">
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                  <Button className="glass-button text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 hover:scale-105 border-0 flex items-center gap-2">
+                    <Trophy className="w-5 h-5" />
                     Join the Waitlist
-                  </StarBorder>
-                </Button>
-              </DialogTrigger>
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="glass-effect text-white max-w-md border-green-500/20">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
-                    <ShinyText 
-                      text="Join the Challenge"
-                      className="text-2xl font-bold"
-                      speed="2.5s"
-                    />
+                    Join the Challenge
                   </DialogTitle>
                 </DialogHeader>
                 
                 {!isSubmitted ? (
                   <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                    {error && (
+                      <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
+                        {error}
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-gray-300">Name</Label>
                       <Input
@@ -134,9 +161,10 @@ export default function Home() {
                     </div>
                     <Button 
                       type="submit" 
+                      disabled={isLoading}
                       className="w-full glass-button text-white font-semibold py-3 rounded-lg transition-all duration-300 hover:scale-105"
                     >
-                      Notify Me
+                      {isLoading ? 'Joining...' : 'Notify Me'}
                     </Button>
                   </form>
                 ) : (
@@ -148,10 +176,17 @@ export default function Home() {
                     </div>
                     <h3 className="text-xl font-semibold text-green-400 mb-2">You're In!</h3>
                     <p className="text-gray-300">We'll notify you when the challenge begins.</p>
+                    {referralCode && (
+                      <div className="mt-4 p-3 rounded-lg bg-green-500/20 border border-green-500/30">
+                        <p className="text-sm text-gray-300 mb-1">Your referral code:</p>
+                        <p className="text-lg font-mono text-green-400 font-bold">{referralCode}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </DialogContent>
             </Dialog>
+            </div>
 
           </div>
         </main>
@@ -160,14 +195,16 @@ export default function Home() {
         <footer className="py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto flex flex-col items-center justify-center text-center">
             <div className="text-gray-400 mb-4">
-              Built by <ShinyText text="Pugly" className="text-green-400 font-semibold inline" speed="3s" /> • Powered by <ShinyText text="ReactBits" className="text-green-300 font-semibold inline" speed="3s" />
+              <ShinyText 
+                text="Built by Pugly • Challenge launch with"
+                className="text-gray-400 inline"
+                speed="3s"
+              />
+              <Heart className="w-4 h-4 text-red-500 inline mx-1" />
             </div>
             <div className="flex gap-4">
               <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
-                <Github className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
-                <Twitter className="h-4 w-4" />
+                <Globe className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-gray-800">
                 <Instagram className="h-4 w-4" />
@@ -176,6 +213,6 @@ export default function Home() {
           </div>
         </footer>
       </div>
-    </AuroraBackground>
+    </ParticleBackground>
   );
 }

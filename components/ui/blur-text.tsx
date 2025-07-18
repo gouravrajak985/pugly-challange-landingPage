@@ -9,9 +9,10 @@ interface BlurTextProps {
     visible: { filter: string; opacity: number };
   };
   duration?: number;
+  delay?: number;
 }
 
-const BlurText = ({ text, className, variant, duration = 1 }: BlurTextProps) => {
+const BlurText = ({ text, className, variant, duration = 1, delay = 0 }: BlurTextProps) => {
   const defaultVariants = {
     hidden: { filter: "blur(10px)", opacity: 0 },
     visible: { filter: "blur(0px)", opacity: 1 },
@@ -22,7 +23,7 @@ const BlurText = ({ text, className, variant, duration = 1 }: BlurTextProps) => 
     <motion.h1
       initial="hidden"
       animate="visible"
-      transition={{ duration }}
+      transition={{ duration, delay }}
       variants={combinedVariants}
       className={cn(className)}
     >
