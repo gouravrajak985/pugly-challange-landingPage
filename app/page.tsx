@@ -90,7 +90,7 @@ export default function Home() {
                 <BlurText 
                   text="Pugly Dropshipping Challenge"
                   className="text-4xl sm:text-6xl lg:text-7xl font-bold"
-                  delay={200}
+                  delay={1}
                 />
               </div>
             </div>
